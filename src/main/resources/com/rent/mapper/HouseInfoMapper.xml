@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.rent.mapper.HouseInfoMapper">
+
+    <resultMap id="HouseInfoMap" type="houseInfo">
+        <id property="fwid" column="fwid"></id>
+        <result property="uid" column="uid"></result>
+        <result property="jdid" column="jdid"></result>
+        <result property="lxid" column="lxid"></result>
+        <result property="shi" column="shi"></result>
+        <result property="ting" column="ting"></result>
+        <result property="fwxx" column="fwxx"></result>
+        <result property="zj" column="zj"></result>
+        <result property="title" column="title"></result>
+        <result property="date" column="date"></result>
+        <result property="telephone" column="telephone"></result>
+        <result property="lxr" column="lxr"></result>
+        <association property="street" javaType="street" column="jdid"
+                     select="com.rent.mapper.StreetMapper.queryStreetById" fetchType="lazy"></association>
+        <association property="houseType" javaType="houseType" column="lxid"
+                     select="com.rent.mapper.HouseTypeMapper.queryHouseTypeById" fetchType="lazy"></association>
+    </resultMap>
+
+    <select id="queryHouseInfo" resultType="houseInfo">
+        select * from tbl_fwxx
+    </select>
+
+    <select id="getHouseDetail" parameterType="int" resultMap="HouseInfoMap">
+        SELECT * FROM tbl_fwxx WHERE fwid=#{id}
+    </select>
+
+    <delete id="deleteHouseInfoById" parameterType="int">
+        delete from tbl_fwxx where fwid=#{id}
+    </delete>
+
+    <insert id="saveHouseInfo" parameterType="houseInfo">
+        INSERT INTO tbl_fwxx(`uid`,`jdid`,`lxid`,`shi`,`ting`,`fwxx`,`zj`,`title`,`date`,`telephone`,`lxr`) VALUES(#{uid},#{jdid},#{lxid},#{shi},#{ting},#{fwxx},#{zj},#{title},#{date},#{telephone},#{lxr})
+    </insert>
+
+    <update id="updateHouseInfo" parameterType="houseInfo">
+        update tbl_fwxx set `jdid`=#{jdid},`lxid`=#{lxid},`shi`=#{shi},`ting`=#{ting},`fwxx`=#{fwxx},`zj`=#{zj},`title`=#{title},`telephone`=#{telephone},`lxr`=#{lxr} where `fwid`=#{fwid}
+    </update>
+
+    <select id="queryHouseInfoByMultiCondition" parameterType="com.rent.dto.HouseInfoQueryDto" resultType="houseInfo"
+            flushCache="true">
+        SELECT fwxx.* FROM tbl_fwxx fwxx JOIN tbl_jd jd ON fwxx.jdid=jd.jdid
+        <where>
+            <!--标题-->
+            <if test="title !=null and title !=''">
+                <bind name="myTitle" value="'%'+title+'%'"/>
+                and fwxx.title like #{myTitle}
+            </if>
+            <!--区县-->
+            <if test="qxid!=0">
+                and jd.qxid=#{qxid}
+            </if>
+            <!--街道-->
+            <if test="jdid!=0">
+                and fwxx.jdid=#{jdid}
+            </if>
+            <!--价格区间-->
+            <if test="zjBegin!='' and zjEnd==''">
+                <![CDATA[
+				and (fwxx.zj+0) >= (#{zjBegin}+0)
+				]]>
+            </if>
+            <if test="zjEnd!='' and zjBegin==''">
+                <![CDATA[
+				and fwxx.zj <= (#{zjEnd}+0)
+			    ]]>
+            </if>
+            <if test="zjBegin!='' and zjEnd!=''">
+                and fwxx.zj between #{zjBegin}+0 and #{zjEnd}+0
+            </if>
+            <if test="shi!=0">
+                and fwxx.shi=#{shi}
+            </if>
+            <if test="ting!=0">
+                and fwxx.ting=#{ting}
+            </if>
+            <if test="fwlx!=null and fwlx.length>0">
+                and fwxx.lxid in
+                <foreach collection="fwlx" open="(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="date>0">
+                <![CDATA[
+				and
+				DATE_SUB(CURDATE(), INTERVAL #{date} DAY) <= fwxx.date
+			    ]]>
+            </if>
+        </where>
+    </select>
+</mapper>

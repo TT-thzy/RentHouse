@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.rent.mapper.StreetMapper">
+
+    <resultMap id="streetMap" type="street">
+        <id property="jdid" column="jdid"></id>
+        <result property="jd" column="jd"></result>
+        <result property="qxid" column="qxid"></result>
+        <association property="districts" column="qxid" javaType="Districts" select="com.rent.mapper.DistrictsMapper.queryDistrictsById" fetchType="lazy"></association>
+    </resultMap>
+
+    <!--根据id查询街道-->
+    <select id="queryStreetById" parameterType="int" resultMap="streetMap">
+        SELECT * FROM tbl_jd WHERE jdid=#{id}
+    </select>
+
+    <select id="queryStreetByQxid" resultType="street" parameterType="int">
+        select * from tbl_jd where qxid=#{id} order by jdid
+    </select>
+
+</mapper>

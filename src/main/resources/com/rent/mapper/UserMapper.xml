@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.rent.mapper.UserMapper">
+
+    <resultMap id="userMap" type="user">
+        <id property="uid" column="uid"></id>
+        <result property="uname" column="uname"></result>
+        <result property="upass" column="upass"></result>
+        <collection property="houseInfos" ofType="houseInfo">
+            <id property="fwid" column="fwid"></id>
+            <result property="uid" column="uid"></result>
+            <result property="jdid" column="jdid"></result>
+            <result property="lxid" column="lxid"></result>
+            <result property="shi" column="shi"></result>
+            <result property="ting" column="ting"></result>
+            <result property="fwxx" column="fwxx"></result>
+            <result property="zj" column="zj"></result>
+            <result property="title" column="title"></result>
+            <result property="date" column="date"></result>
+            <result property="telephone" column="telephone"></result>
+            <result property="lxr" column="lxr"></result>
+        </collection>
+    </resultMap>
+
+    <!--根据用户名和密码查询用户-->
+    <select id="queryByNameAndPassword" parameterType="hashmap" resultType="user">
+        SELECT * FROM `tbl_user` WHERE uname=#{uname} AND upass=#{upass}
+    </select>
+
+    <!--保存用户密码和账号-->
+    <insert id="saveUser" parameterType="user" >
+        INSERT INTO tbl_user(`uname`,`upass`) VALUES(#{uname},#{upass})
+    </insert>
+
+    <!--根据用户名查询用户-->
+    <select id="queryUserByUsername" resultType="user" parameterType="string">
+        SELECT * FROM tbl_user WHERE uname=#{uname}
+    </select>
+
+    <!--根据用户id查询该用户发布的房屋信息-->
+    <select id="queryHouseInfoByUid" resultMap="userMap" parameterType="string">
+        SELECT * FROM tbl_user u JOIN tbl_fwxx f ON u.uid=f.uid WHERE u.uid=#{id}
+    </select>
+</mapper>

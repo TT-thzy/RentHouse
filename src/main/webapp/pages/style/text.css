@@ -1,0 +1,17 @@
+.editbox {
+	background: #E3E3E3;
+	border-bottom: #333333 1px solid;
+	border-left: 0px;
+	border-right: 0px;
+	border-top: 0px;
+	color: #333333;
+	cursor: text;
+	font-family: "Arial";
+	font-size: 9pt;
+	height: 20px;
+	padding: 1px
+}
+
+.unnamed1 {
+	border: 1px solid #000000;
+}
